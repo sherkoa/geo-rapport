@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GEO-rapport exempelmyndigheten.example</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10); --good:#006300; --bad:#d03b3b; --warn:#fab219;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --deemph:#a9a79f; --heat:42,120,214;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10); --good:#0ca30c; --bad:#e66767;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --deemph:#5f5e58; --heat:57,135,229;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 64px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:19px;margin:36px 0 12px}
+h3{font-size:15px;margin:0 0 2px}
+.sub{color:var(--ink2);margin:0 0 6px}
+.note{color:var(--ink2);font-size:13px;margin:6px 0 0}
+.banner{border:2px solid var(--warn);border-radius:8px;padding:12px 16px;margin:0 0 20px;font-weight:600}
+.warnings{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:14px}
+.warnings ul{margin:6px 0;padding-left:20px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:18px}
+.two{grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-width:0}
+.kpi .label{color:var(--ink2);font-size:13px}
+.kpi .value{font-size:32px;font-weight:600;line-height:1.2;margin:2px 0}
+.kpi .delta{font-size:13px;color:var(--ink2)}
+.up{color:var(--good);font-weight:600}.down{color:var(--bad);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--ink2);margin:6px 0}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+svg{display:block;width:100%;overflow:visible}
+svg text{fill:var(--muted);font-size:11px}
+svg text.val{fill:var(--ink)}
+svg text.cat{fill:var(--ink2);font-size:12px}
+svg:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+th{color:var(--ink2);font-weight:600}
+th.sort{cursor:pointer;user-select:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.heat{text-align:center;font-variant-numeric:tabular-nums;border:2px solid var(--surface)}
+td.url{overflow-wrap:anywhere}
+details{margin-top:8px;font-size:13px}
+summary{cursor:pointer;color:var(--ink2)}
+#tip{position:fixed;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--axis);border-radius:8px;padding:8px 10px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.18);display:none;z-index:9;max-width:320px}
+#tip b{display:block;margin-bottom:2px}
+#tip i{display:inline-block;width:10px;height:3px;margin-right:6px;vertical-align:middle}
+dl{font-size:14px}dt{font-weight:600;margin-top:8px}dd{margin:0;color:var(--ink2)}
+@media print{#tip{display:none!important}.card{break-inside:avoid}}
+</style>
+<style>
+.site{background:var(--surface);border-bottom:1px solid var(--border)}
+.site div{max-width:1120px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline}
+.site strong{font-size:16px}
+.site span{color:var(--ink2);font-size:13px}
+.site nav{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto}
+a{color:var(--s1)}
+.site nav a,#sektioner a{color:var(--ink);text-decoration:none;padding:5px 10px;border-radius:6px;font-size:14px}
+.site nav a:hover,#sektioner a:hover{background:var(--grid)}
+.site nav a[aria-current=page]{background:var(--ink);color:var(--surface)}
+#sektioner{display:flex;flex-wrap:wrap;gap:4px;margin:14px 0 0}
+#sektioner a{border:1px solid var(--border);background:var(--surface);font-size:13px}
+h2{scroll-margin-top:12px}
+</style>
+<meta name="robots" content="noindex">
+<style>.card::before{content:"DEMO \2013  p\00E5hittade siffror och namn";display:block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink2);border-bottom:2px solid var(--warn);margin-bottom:8px;padding-bottom:3px}</style>
+</head>
+<body>
+<header class="site"><div><strong>Synlighet i AI-svar: exempelmyndigheten.example</strong><span>DEMO: påhittade siffror och namn</span><nav aria-label="Huvudmeny"><a href="../index.html">Senaste rapporten</a><a href="../matdagar.html">Alla mätdagar</a><a href="../fragor.html">Frågor och metod</a><a href="../../index.html">Till riktiga sidan</a></nav></div></header>
+<div class="wrap" id="app"></div>
+<div id="tip" role="status"></div>
+<script>
+"use strict";
+const D = {"meta":{"datum":"2026-11-21","foregaende":"2026-11-20","testdata":true,"skapad":"2026-11-25 11:52","svar":600,"forvantat":600,"ejIfyllda":0,"antalFragor":50,"filer":["matning_2026-11-18_testdata.csv","matning_2026-11-19_testdata.csv","matning_2026-11-20_testdata.csv","matning_2026-11-21_testdata.csv","matning_2026-11-22_testdata.csv","matning_2026-11-23_testdata.csv","matning_2026-11-24_testdata.csv","matning_2026-11-25_testdata.csv"],"bedomning":"Förändringen i citeringsgrad mot 2026-11-20 ryms inom normal slumpvariation."},"varningar":[],"idag":{"n":600,"citerade":349,"citeringsgrad":0.5817,"ciLag":0.5418,"ciHog":0.6205,"webbN":457,"citeringsgradWebb":0.5755,"sov":0.3382,"sovAlla":0.2865,"placering":1.7994,"median":2,"andelForst":0.4556,"andelTopp3":0.9513,"anvandning":0.4467,"anvandningN":600,"utanLank":51,"typer":{"citat":72,"parafras":196,"omnamnande":114,"ingen":218},"geo":52.7916,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5817,"kalla-b.example":0.2833,"kalla-c.example":0.265,"kalla-d.example":0.32,"kalla-e.example":0.27}},"igar":{"n":600,"citerade":327,"citeringsgrad":0.545,"ciLag":0.505,"ciHog":0.5844,"webbN":446,"citeringsgradWebb":0.5583,"sov":0.3082,"sovAlla":0.2618,"placering":1.8196,"median":2,"andelForst":0.4832,"andelTopp3":0.9419,"anvandning":0.4017,"anvandningN":600,"utanLank":48,"typer":{"citat":73,"parafras":168,"omnamnande":117,"ingen":242},"geo":49.9382,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.545,"kalla-b.example":0.2933,"kalla-c.example":0.33,"kalla-d.example":0.315,"kalla-e.example":0.285}},"snitt7":{"n":1800,"citerade":956,"citeringsgrad":0.5311,"ciLag":0.508,"ciHog":0.5541,"webbN":1332,"citeringsgradWebb":0.533,"sov":0.3009,"sovAlla":0.2575,"placering":1.8159,"median":2,"andelForst":0.4791,"andelTopp3":0.9435,"anvandning":0.405,"anvandningN":1800,"utanLank":167,"typer":{"citat":201,"parafras":528,"omnamnande":345,"ingen":726},"geo":49.2919,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5311,"kalla-b.example":0.2994,"kalla-c.example":0.3144,"kalla-d.example":0.3189,"kalla-e.example":0.3011}},"trend":[{"datum":"2026-11-18","alla":{"n":600,"citerade":316,"citeringsgrad":0.5267,"ciLag":0.4867,"ciHog":0.5663,"webbN":443,"citeringsgradWebb":0.5395,"sov":0.2948,"sovAlla":0.2528,"placering":1.8861,"median":2,"andelForst":0.4304,"andelTopp3":0.943,"anvandning":0.4083,"anvandningN":600,"utanLank":59,"typer":{"citat":57,"parafras":188,"omnamnande":111,"ingen":244},"geo":48.5033,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5267,"kalla-b.example":0.3267,"kalla-c.example":0.3033,"kalla-d.example":0.3367,"kalla-e.example":0.2933}},"tjanster":{"TjänstA":{"n":150,"citerade":83,"citeringsgrad":0.5533,"ciLag":0.4734,"ciHog":0.6306,"webbN":111,"citeringsgradWebb":0.5495,"sov":0.3109,"sovAlla":0.2704,"placering":1.8193,"median":2,"andelForst":0.4458,"andelTopp3":0.9518,"anvandning":0.4067,"anvandningN":150,"utanLank":15,"typer":{"citat":13,"parafras":48,"omnamnande":28,"ingen":61},"geo":50.1385,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5533,"kalla-b.example":0.3533,"kalla-c.example":0.28,"kalla-d.example":0.3467,"kalla-e.example":0.2467}},"TjänstB":{"n":150,"citerade":100,"citeringsgrad":0.6667,"ciLag":0.5879,"ciHog":0.7371,"webbN":110,"citeringsgradWebb":0.6727,"sov":0.3356,"sovAlla":0.2874,"placering":2,"median":2,"andelForst":0.41,"andelTopp3":0.92,"anvandning":0.42,"anvandningN":150,"utanLank":13,"typer":{"citat":16,"parafras":47,"omnamnande":31,"ingen":56},"geo":54.6681,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.6667,"kalla-b.example":0.3267,"kalla-c.example":0.3133,"kalla-d.example":0.38,"kalla-e.example":0.3}},"TjänstC":{"n":150,"citerade":60,"citeringsgrad":0.4,"ciLag":0.325,"ciHog":0.48,"webbN":112,"citeringsgradWebb":0.4196,"sov":0.24,"sovAlla":0.2041,"placering":1.9167,"median":2,"andelForst":0.45,"andelTopp3":0.9333,"anvandning":0.3867,"anvandningN":150,"utanLank":19,"typer":{"citat":10,"parafras":48,"omnamnande":26,"ingen":66},"geo":42.0056,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.4,"kalla-b.example":0.3333,"kalla-c.example":0.3,"kalla-d.example":0.3333,"kalla-e.example":0.3}},"TjänstD":{"n":150,"citerade":73,"citeringsgrad":0.4867,"ciLag":0.408,"ciHog":0.566,"webbN":110,"citeringsgradWebb":0.5182,"sov":0.284,"sovAlla":0.2425,"placering":1.7808,"median":2,"andelForst":0.4247,"andelTopp3":0.9726,"anvandning":0.42,"anvandningN":150,"utanLank":12,"typer":{"citat":18,"parafras":45,"omnamnande":26,"ingen":61},"geo":47.1869,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.4867,"kalla-b.example":0.2933,"kalla-c.example":0.32,"kalla-d.example":0.2867,"kalla-e.example":0.3267}}}},{"datum":"2026-11-19","alla":{"n":600,"citerade":313,"citeringsgrad":0.5217,"ciLag":0.4817,"ciHog":0.5614,"webbN":443,"citeringsgradWebb":0.5011,"sov":0.2998,"sovAlla":0.2578,"placering":1.7412,"median":1,"andelForst":0.524,"andelTopp3":0.9457,"anvandning":0.405,"anvandningN":600,"utanLank":60,"typer":{"citat":71,"parafras":172,"omnamnande":117,"ingen":240},"geo":49.4399,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5217,"kalla-b.example":0.2783,"kalla-c.example":0.31,"kalla-d.example":0.305,"kalla-e.example":0.325}},"tjanster":{"TjänstA":{"n":150,"citerade":84,"citeringsgrad":0.56,"ciLag":0.48,"ciHog":0.637,"webbN":112,"citeringsgradWebb":0.5268,"sov":0.3043,"sovAlla":0.2593,"placering":1.6548,"median":1,"andelForst":0.5476,"andelTopp3":0.9524,"anvandning":0.4333,"anvandningN":150,"utanLank":13,"typer":{"citat":17,"parafras":48,"omnamnande":26,"ingen":59},"geo":52.0346,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.56,"kalla-b.example":0.2467,"kalla-c.example":0.3267,"kalla-d.example":0.36,"kalla-e.example":0.3467}},"TjänstB":{"n":150,"citerade":79,"citeringsgrad":0.5267,"ciLag":0.4471,"ciHog":0.6049,"webbN":107,"citeringsgradWebb":0.5421,"sov":0.3224,"sovAlla":0.2801,"placering":1.7722,"median":1,"andelForst":0.5443,"andelTopp3":0.9241,"anvandning":0.4067,"anvandningN":150,"utanLank":12,"typer":{"citat":23,"parafras":38,"omnamnande":35,"ingen":54},"geo":50.227,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5267,"kalla-b.example":0.2267,"kalla-c.example":0.2467,"kalla-d.example":0.3333,"kalla-e.example":0.3}},"TjänstC":{"n":150,"citerade":68,"citeringsgrad":0.4533,"ciLag":0.3758,"ciHog":0.5332,"webbN":119,"citeringsgradWebb":0.437,"sov":0.2857,"sovAlla":0.2386,"placering":1.7353,"median":1.5,"andelForst":0.5,"andelTopp3":0.9853,"anvandning":0.3733,"anvandningN":150,"utanLank":20,"typer":{"citat":13,"parafras":43,"omnamnande":33,"ingen":61},"geo":45.5888,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.4533,"kalla-b.example":0.28,"kalla-c.example":0.2933,"kalla-d.example":0.24,"kalla-e.example":0.32}},"TjänstD":{"n":150,"citerade":82,"citeringsgrad":0.5467,"ciLag":0.4668,"ciHog":0.6242,"webbN":105,"citeringsgradWebb":0.5048,"sov":0.2877,"sovAlla":0.2539,"placering":1.8049,"median":1.5,"andelForst":0.5,"andelTopp3":0.9268,"anvandning":0.4067,"anvandningN":150,"utanLank":15,"typer":{"citat":18,"parafras":43,"omnamnande":23,"ingen":66},"geo":49.8885,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5467,"kalla-b.example":0.36,"kalla-c.example":0.3733,"kalla-d.example":0.2867,"kalla-e.example":0.3333}}}},{"datum":"2026-11-20","alla":{"n":600,"citerade":327,"citeringsgrad":0.545,"ciLag":0.505,"ciHog":0.5844,"webbN":446,"citeringsgradWebb":0.5583,"sov":0.3082,"sovAlla":0.2618,"placering":1.8196,"median":2,"andelForst":0.4832,"andelTopp3":0.9419,"anvandning":0.4017,"anvandningN":600,"utanLank":48,"typer":{"citat":73,"parafras":168,"omnamnande":117,"ingen":242},"geo":49.9382,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.545,"kalla-b.example":0.2933,"kalla-c.example":0.33,"kalla-d.example":0.315,"kalla-e.example":0.285}},"tjanster":{"TjänstA":{"n":150,"citerade":86,"citeringsgrad":0.5733,"ciLag":0.4933,"ciHog":0.6497,"webbN":114,"citeringsgradWebb":0.6053,"sov":0.315,"sovAlla":0.2638,"placering":1.814,"median":1,"andelForst":0.5116,"andelTopp3":0.9419,"anvandning":0.3733,"anvandningN":150,"utanLank":9,"typer":{"citat":19,"parafras":37,"omnamnande":31,"ingen":63},"geo":50.8283,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5733,"kalla-b.example":0.3133,"kalla-c.example":0.3467,"kalla-d.example":0.32,"kalla-e.example":0.2667}},"TjänstB":{"n":150,"citerade":96,"citeringsgrad":0.64,"ciLag":0.5606,"ciHog":0.7124,"webbN":109,"citeringsgradWebb":0.6422,"sov":0.3441,"sovAlla":0.2972,"placering":1.8229,"median":2,"andelForst":0.4479,"andelTopp3":0.9583,"anvandning":0.4467,"anvandningN":150,"utanLank":7,"typer":{"citat":21,"parafras":46,"omnamnande":31,"ingen":52},"geo":55.0609,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.64,"kalla-b.example":0.3,"kalla-c.example":0.32,"kalla-d.example":0.32,"kalla-e.example":0.28}},"TjänstC":{"n":150,"citerade":65,"citeringsgrad":0.4333,"ciLag":0.3567,"ciHog":0.5133,"webbN":105,"citeringsgradWebb":0.4571,"sov":0.2621,"sovAlla":0.2138,"placering":2.1077,"median":2,"andelForst":0.3846,"andelTopp3":0.8615,"anvandning":0.3533,"anvandningN":150,"utanLank":18,"typer":{"citat":16,"parafras":37,"omnamnande":33,"ingen":64},"geo":42.1496,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.4333,"kalla-b.example":0.3133,"kalla-c.example":0.34,"kalla-d.example":0.28,"kalla-e.example":0.2867}},"TjänstD":{"n":150,"citerade":80,"citeringsgrad":0.5333,"ciLag":0.4537,"ciHog":0.6113,"webbN":118,"citeringsgradWebb":0.5254,"sov":0.3065,"sovAlla":0.2703,"placering":1.5875,"median":1,"andelForst":0.575,"andelTopp3":0.9875,"anvandning":0.4333,"anvandningN":150,"utanLank":14,"typer":{"citat":17,"parafras":48,"omnamnande":22,"ingen":63},"geo":51.3886,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5333,"kalla-b.example":0.2467,"kalla-c.example":0.3133,"kalla-d.example":0.34,"kalla-e.example":0.3067}}}},{"datum":"2026-11-21","alla":{"n":600,"citerade":349,"citeringsgrad":0.5817,"ciLag":0.5418,"ciHog":0.6205,"webbN":457,"citeringsgradWebb":0.5755,"sov":0.3382,"sovAlla":0.2865,"placering":1.7994,"median":2,"andelForst":0.4556,"andelTopp3":0.9513,"anvandning":0.4467,"anvandningN":600,"utanLank":51,"typer":{"citat":72,"parafras":196,"omnamnande":114,"ingen":218},"geo":52.7916,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5817,"kalla-b.example":0.2833,"kalla-c.example":0.265,"kalla-d.example":0.32,"kalla-e.example":0.27}},"tjanster":{"TjänstA":{"n":150,"citerade":94,"citeringsgrad":0.6267,"ciLag":0.547,"ciHog":0.7,"webbN":116,"citeringsgradWebb":0.6034,"sov":0.3629,"sovAlla":0.3241,"placering":1.6383,"median":1,"andelForst":0.5106,"andelTopp3":0.9787,"anvandning":0.4533,"anvandningN":150,"utanLank":8,"typer":{"citat":19,"parafras":49,"omnamnande":25,"ingen":57},"geo":56.0374,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.6267,"kalla-b.example":0.2667,"kalla-c.example":0.2333,"kalla-d.example":0.3333,"kalla-e.example":0.2667}},"TjänstB":{"n":150,"citerade":102,"citeringsgrad":0.68,"ciLag":0.6017,"ciHog":0.7494,"webbN":117,"citeringsgradWebb":0.6667,"sov":0.375,"sovAlla":0.3168,"placering":1.8431,"median":2,"andelForst":0.451,"andelTopp3":0.9706,"anvandning":0.4533,"anvandningN":150,"utanLank":8,"typer":{"citat":24,"parafras":44,"omnamnande":32,"ingen":50},"geo":57.368,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.68,"kalla-b.example":0.3,"kalla-c.example":0.2733,"kalla-d.example":0.2667,"kalla-e.example":0.2933}},"TjänstC":{"n":150,"citerade":70,"citeringsgrad":0.4667,"ciLag":0.3887,"ciHog":0.5463,"webbN":110,"citeringsgradWebb":0.4818,"sov":0.2893,"sovAlla":0.2365,"placering":2.0429,"median":2,"andelForst":0.3429,"andelTopp3":0.9,"anvandning":0.44,"anvandningN":150,"utanLank":22,"typer":{"citat":11,"parafras":55,"omnamnande":26,"ingen":58},"geo":45.6661,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.4667,"kalla-b.example":0.28,"kalla-c.example":0.2467,"kalla-d.example":0.3667,"kalla-e.example":0.2533}},"TjänstD":{"n":150,"citerade":83,"citeringsgrad":0.5533,"ciLag":0.4734,"ciHog":0.6306,"webbN":114,"citeringsgradWebb":0.5439,"sov":0.3205,"sovAlla":0.2677,"placering":1.7229,"median":2,"andelForst":0.494,"andelTopp3":0.9398,"anvandning":0.44,"anvandningN":150,"utanLank":13,"typer":{"citat":18,"parafras":48,"omnamnande":31,"ingen":53},"geo":51.7161,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5533,"kalla-b.example":0.2867,"kalla-c.example":0.3067,"kalla-d.example":0.3133,"kalla-e.example":0.2667}}}}],"tjanster":[{"namn":"TjänstA","matt":{"n":150,"citerade":94,"citeringsgrad":0.6267,"ciLag":0.547,"ciHog":0.7,"webbN":116,"citeringsgradWebb":0.6034,"sov":0.3629,"sovAlla":0.3241,"placering":1.6383,"median":1,"andelForst":0.5106,"andelTopp3":0.9787,"anvandning":0.4533,"anvandningN":150,"utanLank":8,"typer":{"citat":19,"parafras":49,"omnamnande":25,"ingen":57},"geo":56.0374,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.6267,"kalla-b.example":0.2667,"kalla-c.example":0.2333,"kalla-d.example":0.3333,"kalla-e.example":0.2667}}},{"namn":"TjänstB","matt":{"n":150,"citerade":102,"citeringsgrad":0.68,"ciLag":0.6017,"ciHog":0.7494,"webbN":117,"citeringsgradWebb":0.6667,"sov":0.375,"sovAlla":0.3168,"placering":1.8431,"median":2,"andelForst":0.451,"andelTopp3":0.9706,"anvandning":0.4533,"anvandningN":150,"utanLank":8,"typer":{"citat":24,"parafras":44,"omnamnande":32,"ingen":50},"geo":57.368,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.68,"kalla-b.example":0.3,"kalla-c.example":0.2733,"kalla-d.example":0.2667,"kalla-e.example":0.2933}}},{"namn":"TjänstC","matt":{"n":150,"citerade":70,"citeringsgrad":0.4667,"ciLag":0.3887,"ciHog":0.5463,"webbN":110,"citeringsgradWebb":0.4818,"sov":0.2893,"sovAlla":0.2365,"placering":2.0429,"median":2,"andelForst":0.3429,"andelTopp3":0.9,"anvandning":0.44,"anvandningN":150,"utanLank":22,"typer":{"citat":11,"parafras":55,"omnamnande":26,"ingen":58},"geo":45.6661,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.4667,"kalla-b.example":0.28,"kalla-c.example":0.2467,"kalla-d.example":0.3667,"kalla-e.example":0.2533}}},{"namn":"TjänstD","matt":{"n":150,"citerade":83,"citeringsgrad":0.5533,"ciLag":0.4734,"ciHog":0.6306,"webbN":114,"citeringsgradWebb":0.5439,"sov":0.3205,"sovAlla":0.2677,"placering":1.7229,"median":2,"andelForst":0.494,"andelTopp3":0.9398,"anvandning":0.44,"anvandningN":150,"utanLank":13,"typer":{"citat":18,"parafras":48,"omnamnande":31,"ingen":53},"geo":51.7161,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5533,"kalla-b.example":0.2867,"kalla-c.example":0.3067,"kalla-d.example":0.3133,"kalla-e.example":0.2667}}}],"omraden":[{"namn":"Statistik och register","matt":{"n":120,"citerade":67,"citeringsgrad":0.5583,"ciLag":0.469,"ciHog":0.644,"webbN":90,"citeringsgradWebb":0.5333,"sov":0.3045,"sovAlla":0.2587,"placering":1.9701,"median":2,"andelForst":0.4776,"andelTopp3":0.8806,"anvandning":0.3917,"anvandningN":120,"utanLank":9,"typer":{"citat":9,"parafras":38,"omnamnande":25,"ingen":48},"geo":49.9193,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5583,"kalla-b.example":0.2833,"kalla-c.example":0.3083,"kalla-d.example":0.425,"kalla-e.example":0.2583}},"tjanster":{"TjänstA":0.5333,"TjänstB":0.7333,"TjänstC":0.4667,"TjänstD":0.5}},{"namn":"Föreskrifter och regler","matt":{"n":84,"citerade":44,"citeringsgrad":0.5238,"ciLag":0.4183,"ciHog":0.6272,"webbN":63,"citeringsgradWebb":0.5397,"sov":0.3259,"sovAlla":0.2667,"placering":1.9773,"median":2,"andelForst":0.3409,"andelTopp3":0.9318,"anvandning":0.4405,"anvandningN":84,"utanLank":10,"typer":{"citat":8,"parafras":29,"omnamnande":16,"ingen":31},"geo":48.7425,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.5238,"kalla-b.example":0.2976,"kalla-c.example":0.2381,"kalla-d.example":0.2976,"kalla-e.example":0.25}},"tjanster":{"TjänstA":0.7143,"TjänstB":0.5714,"TjänstC":0.2857,"TjänstD":0.5238}},{"namn":"Nationella riktlinjer och kunskapsstöd","matt":{"n":120,"citerade":79,"citeringsgrad":0.6583,"ciLag":0.5697,"ciHog":0.7371,"webbN":84,"citeringsgradWebb":0.6667,"sov":0.3607,"sovAlla":0.3135,"placering":1.7848,"median":2,"andelForst":0.4051,"andelTopp3":0.9747,"anvandning":0.525,"anvandningN":120,"utanLank":13,"typer":{"citat":16,"parafras":47,"omnamnande":20,"ingen":37},"geo":57.5374,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.6583,"kalla-b.example":0.2583,"kalla-c.example":0.2667,"kalla-d.example":0.35,"kalla-e.example":0.2917}},"tjanster":{"TjänstA":0.7667,"TjänstB":0.8,"TjänstC":0.5333,"TjänstD":0.5333}},{"namn":"Legitimation och behörighet","matt":{"n":72,"citerade":44,"citeringsgrad":0.6111,"ciLag":0.4956,"ciHog":0.7153,"webbN":57,"citeringsgradWebb":0.5965,"sov":0.3761,"sovAlla":0.3165,"placering":1.6364,"median":1,"andelForst":0.5682,"andelTopp3":0.9545,"anvandning":0.4722,"anvandningN":72,"utanLank":5,"typer":{"citat":10,"parafras":24,"omnamnande":14,"ingen":24},"geo":56.486,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.6111,"kalla-b.example":0.25,"kalla-c.example":0.2639,"kalla-d.example":0.2361,"kalla-e.example":0.2639}},"tjanster":{"TjänstA":0.6667,"TjänstB":0.6111,"TjänstC":0.5,"TjänstD":0.6667}},{"namn":"Socialtjänst, barn och unga, äldre","matt":{"n":96,"citerade":58,"citeringsgrad":0.6042,"ciLag":0.5041,"ciHog":0.6962,"webbN":76,"citeringsgradWebb":0.6053,"sov":0.3333,"sovAlla":0.2802,"placering":1.7586,"median":2,"andelForst":0.4828,"andelTopp3":0.9655,"anvandning":0.4167,"anvandningN":96,"utanLank":6,"typer":{"citat":15,"parafras":25,"omnamnande":25,"ingen":31},"geo":53.2471,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.6042,"kalla-b.example":0.3229,"kalla-c.example":0.2708,"kalla-d.example":0.2812,"kalla-e.example":0.3333}},"tjanster":{"TjänstA":0.5,"TjänstB":0.6667,"TjänstC":0.5417,"TjänstD":0.7083}},{"namn":"Läkemedel, smittskydd och patientsäkerhet","matt":{"n":60,"citerade":27,"citeringsgrad":0.45,"ciLag":0.3309,"ciHog":0.5751,"webbN":47,"citeringsgradWebb":0.4468,"sov":0.314,"sovAlla":0.2571,"placering":1.7037,"median":2,"andelForst":0.4444,"andelTopp3":1,"anvandning":0.4,"anvandningN":60,"utanLank":6,"typer":{"citat":9,"parafras":15,"omnamnande":7,"ingen":29},"geo":46.2297,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.45,"kalla-b.example":0.2833,"kalla-c.example":0.2167,"kalla-d.example":0.25,"kalla-e.example":0.2333}},"tjanster":{"TjänstA":0.5333,"TjänstB":0.6667,"TjänstC":0.2,"TjänstD":0.4}},{"namn":"Krisberedskap, begrepp och data","matt":{"n":48,"citerade":30,"citeringsgrad":0.625,"ciLag":0.4836,"ciHog":0.7478,"webbN":40,"citeringsgradWebb":0.6,"sov":0.3704,"sovAlla":0.3297,"placering":1.6,"median":1.5,"andelForst":0.5,"andelTopp3":1,"anvandning":0.4792,"anvandningN":48,"utanLank":2,"typer":{"citat":5,"parafras":18,"omnamnande":7,"ingen":18},"geo":56.6574,"geoUtanAnvandning":false,"domaner":{"exempelmyndigheten.example":0.625,"kalla-b.example":0.2917,"kalla-c.example":0.25,"kalla-d.example":0.3125,"kalla-e.example":0.2083}},"tjanster":{"TjänstA":0.6667,"TjänstB":0.5833,"TjänstC":0.75,"TjänstD":0.5}}],"fragor":[{"nr":1,"fraga":"Hur många dog i Sverige av cancer förra året?","omrade":"Statistik och register","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.4167,"fore":0.5,"placering":1.4,"sov":0.2174,"anvandning":0.3333},{"nr":2,"fraga":"Vilka är de vanligaste dödsorsakerna i Sverige?","omrade":"Statistik och register","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.3333,"fore":0.5833,"placering":1.75,"sov":0.25,"anvandning":0.1667},{"nr":3,"fraga":"Hur har antalet cancerfall i Sverige utvecklats de senaste 20 åren?","omrade":"Statistik och register","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.4167,"fore":0.5,"placering":2.4,"sov":0.2083,"anvandning":0.25},{"nr":4,"fraga":"Hur många personer med demens finns det i Sverige?","omrade":"Statistik och register","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.4167,"fore":0.5833,"placering":1.2,"sov":0.3333,"anvandning":0.25},{"nr":5,"fraga":"Hur många aborter görs i Sverige per år?","omrade":"Statistik och register","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.5833,"placering":2.25,"sov":0.3077,"anvandning":0.5},{"nr":6,"fraga":"Hur många barn föds med kejsarsnitt i Sverige?","omrade":"Statistik och register","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.9167,"fore":0.5,"placering":1.8182,"sov":0.44,"anvandning":0.5},{"nr":7,"fraga":"Hur ofta förskrivs antidepressiva läkemedel till unga i Sverige?","omrade":"Statistik och register","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.5833,"placering":2,"sov":0.3333,"anvandning":0.5833},{"nr":8,"fraga":"Var hittar jag statistik från patientregistret och läkemedelsregistret?","omrade":"Statistik och register","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.5833,"placering":3,"sov":0.25,"anvandning":0.4167},{"nr":9,"fraga":"Hur många personer får insatser enligt LSS i Sverige?","omrade":"Statistik och register","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.4167,"placering":1.3333,"sov":0.3,"anvandning":0.5833},{"nr":10,"fraga":"Hur många äldre har hemtjänst eller bor på särskilt boende?","omrade":"Statistik och register","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.75,"fore":0.5,"placering":2.2222,"sov":0.3913,"anvandning":0.3333},{"nr":11,"fraga":"Vad säger Exempelmyndighetens föreskrifter om ledningssystem för systematiskt kvalitetsarbete?","omrade":"Föreskrifter och regler","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.4167,"placering":2.25,"sov":0.3636,"anvandning":0.6667},{"nr":12,"fraga":"Vilka föreskrifter gäller för journalföring i hälso- och sjukvården?","omrade":"Föreskrifter och regler","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.5,"placering":2,"sov":0.381,"anvandning":0.4167},{"nr":13,"fraga":"Vad är skillnaden mellan föreskrifter och allmänna råd från Exempelmyndigheten?","omrade":"Föreskrifter och regler","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.25,"fore":0.5,"placering":2,"sov":0.1579,"anvandning":0.3333},{"nr":14,"fraga":"Vilka krav gäller för hantering av läkemedel i kommunal hälso- och sjukvård?","omrade":"Föreskrifter och regler","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.3333,"fore":0.3333,"placering":2,"sov":0.2,"anvandning":0.3333},{"nr":15,"fraga":"Vad innebär Exempelmyndighetens föreskrifter om vård i livets slut?","omrade":"Föreskrifter och regler","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.8333,"placering":2.375,"sov":0.3478,"anvandning":0.3333},{"nr":16,"fraga":"Vilka regler gäller för dokumentation inom socialtjänsten?","omrade":"Föreskrifter och regler","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.5833,"placering":1.2857,"sov":0.4375,"anvandning":0.5833},{"nr":17,"fraga":"Vilka krav ställs på verksamheter som utför delegerade hälso- och sjukvårdsuppgifter?","omrade":"Föreskrifter och regler","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.75,"placering":1.8333,"sov":0.4286,"anvandning":0.4167},{"nr":18,"fraga":"Vad säger nationella riktlinjerna om behandling av depression och ångest?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.5833,"placering":1.5714,"sov":0.35,"anvandning":0.5833},{"nr":19,"fraga":"Vilka rekommendationer finns för vård vid diabetes?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.6667,"placering":2,"sov":0.32,"anvandning":0.3333},{"nr":20,"fraga":"Vad rekommenderar nationella riktlinjer vid KOL och astma?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.3333,"placering":2,"sov":0.3333,"anvandning":0.4167},{"nr":21,"fraga":"Vilka rekommendationer finns för vård vid hjärtsjukdom och stroke?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.4167,"placering":1.7143,"sov":0.3043,"anvandning":0.5833},{"nr":22,"fraga":"Vad säger riktlinjerna om screening för bröstcancer, livmoderhalscancer och tarmcancer?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.75,"fore":0.4167,"placering":1.8889,"sov":0.375,"anvandning":0.6667},{"nr":23,"fraga":"Vad är en nationell riktlinje och hur tas den fram?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"M","bred":true,"n":12,"citeringsgrad":0.8333,"fore":0.6667,"placering":1.5,"sov":0.4545,"anvandning":0.4167},{"nr":24,"fraga":"Vilka rekommendationer finns för tandvård och förebyggande tandvård?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.5833,"placering":1.6667,"sov":0.3333,"anvandning":0.5833},{"nr":25,"fraga":"Vad rekommenderar Exempelmyndigheten vid behandling av missbruk och beroende?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.5,"placering":2.25,"sov":0.2857,"anvandning":0.6667},{"nr":26,"fraga":"Vilket kunskapsstöd finns för vård och omsorg om personer med demenssjukdom?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.75,"fore":0.5833,"placering":1.5556,"sov":0.5294,"anvandning":0.3333},{"nr":27,"fraga":"Vad säger Exempelmyndigheten om vård och behandling vid könsdysfori?","omrade":"Nationella riktlinjer och kunskapsstöd","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.5,"placering":1.75,"sov":0.381,"anvandning":0.6667},{"nr":28,"fraga":"Hur ansöker jag om svensk legitimation som läkare med utbildning från utanför EU?","omrade":"Legitimation och behörighet","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.25,"placering":2.25,"sov":0.4211,"anvandning":0.5833},{"nr":29,"fraga":"Hur lång tid tar det att få legitimation som sjuksköterska i Sverige?","omrade":"Legitimation och behörighet","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.5833,"placering":1.25,"sov":0.3478,"anvandning":0.5},{"nr":30,"fraga":"Vilka yrken inom hälso- och sjukvården är legitimationsyrken?","omrade":"Legitimation och behörighet","malgrupp":"M","bred":true,"n":12,"citeringsgrad":0.5,"fore":0.6667,"placering":1.8333,"sov":0.3529,"anvandning":0.3333},{"nr":31,"fraga":"Vad krävs för att få specialistbevis som läkare?","omrade":"Legitimation och behörighet","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.25,"placering":1.5714,"sov":0.3889,"anvandning":0.5},{"nr":32,"fraga":"Hur fungerar kunskapsprov och praktisk tjänstgöring för utländska läkare?","omrade":"Legitimation och behörighet","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.5833,"placering":1.5,"sov":0.2609,"anvandning":0.3333},{"nr":33,"fraga":"Kan jag få min legitimation återkallad och vad händer då?","omrade":"Legitimation och behörighet","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.75,"fore":0.8333,"placering":1.4444,"sov":0.5294,"anvandning":0.5833},{"nr":34,"fraga":"Vad är skillnaden mellan LVU, LVM och LSS?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.5,"placering":1.3333,"sov":0.375,"anvandning":0.3333},{"nr":35,"fraga":"Hur ska socialtjänsten utreda barn som far illa?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.75,"fore":0.8333,"placering":1.7778,"sov":0.375,"anvandning":0.5833},{"nr":36,"fraga":"Vad säger Exempelmyndigheten om våld i nära relationer och socialtjänstens ansvar?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.5833,"placering":1.6667,"sov":0.2857,"anvandning":0.3333},{"nr":37,"fraga":"Vilket stöd finns för personer som utsätts för våld i nära relationer?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.5,"placering":1.875,"sov":0.381,"anvandning":0.3333},{"nr":38,"fraga":"Vad gäller för ekonomiskt bistånd och försörjningsstöd?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.3333,"placering":1.7143,"sov":0.2917,"anvandning":0.4167},{"nr":39,"fraga":"Vad menas med god kvalitet i äldreomsorgen?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.75,"placering":2.375,"sov":0.3077,"anvandning":0.5},{"nr":40,"fraga":"Vad är en genomförandeplan och vem ska göra den?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5,"fore":0.5,"placering":2,"sov":0.3529,"anvandning":0.3333},{"nr":41,"fraga":"Vilka rättigheter har en person som får insatser enligt LSS?","omrade":"Socialtjänst, barn och unga, äldre","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.25,"placering":1.25,"sov":0.32,"anvandning":0.5},{"nr":42,"fraga":"Vilka läkemedel får sjuksköterskor förskriva?","omrade":"Läkemedel, smittskydd och patientsäkerhet","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.3333,"fore":0.6667,"placering":2,"sov":0.2105,"anvandning":0.3333},{"nr":43,"fraga":"Vad är läkemedelsgenomgång och vem ska få det?","omrade":"Läkemedel, smittskydd och patientsäkerhet","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.5,"placering":1.4286,"sov":0.4667,"anvandning":0.5},{"nr":44,"fraga":"Vad innebär det att anmäla en avvikelse eller risk för vårdskada?","omrade":"Läkemedel, smittskydd och patientsäkerhet","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.3333,"placering":1.5714,"sov":0.3889,"anvandning":0.5833},{"nr":45,"fraga":"Vilka regler gäller för användning av tvångsåtgärder i psykiatrin?","omrade":"Läkemedel, smittskydd och patientsäkerhet","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.3333,"fore":0.5833,"placering":1.75,"sov":0.25,"anvandning":0.4167},{"nr":46,"fraga":"Hur fungerar organdonation i Sverige och hur registrerar jag mitt val?","omrade":"Läkemedel, smittskydd och patientsäkerhet","malgrupp":"M","bred":false,"n":12,"citeringsgrad":0.4167,"fore":0.3333,"placering":2,"sov":0.2778,"anvandning":0.1667},{"nr":47,"fraga":"Vilka krav ställs på hälso- och sjukvårdens krisberedskap och civila försvar?","omrade":"Krisberedskap, begrepp och data","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.8333,"placering":1.625,"sov":0.4211,"anvandning":0.6667},{"nr":48,"fraga":"Vad är ICD-10-SE och hur används diagnoskoder i Sverige?","omrade":"Krisberedskap, begrepp och data","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.6667,"fore":0.6667,"placering":1.625,"sov":0.3077,"anvandning":0.5},{"nr":49,"fraga":"Vad är SNOMED CT och hur används det i svensk vård?","omrade":"Krisberedskap, begrepp och data","malgrupp":"Y","bred":false,"n":12,"citeringsgrad":0.5833,"fore":0.6667,"placering":1.8571,"sov":0.35,"anvandning":0.25},{"nr":50,"fraga":"Var hittar jag Exempelmyndighetens termbank och definitioner av vårdbegrepp?","omrade":"Krisberedskap, begrepp och data","malgrupp":"Y","bred":true,"n":12,"citeringsgrad":0.5833,"fore":0.75,"placering":1.2857,"sov":0.4375,"anvandning":0.5}],"sidor":[{"sida":"exempelmyndigheten.example/statistik-och-data/statistik","svar":97,"fragor":"1, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 38, 39, 40, 41, 43, 44, 45, 46, 47, 48, 49, 50","tjanster":"TjänstA, TjänstB, TjänstD, TjänstC"},{"sida":"exempelmyndigheten.example/kunskapsstod-och-regler/regler-och-riktlinjer","svar":86,"fragor":"1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 29, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 45, 47, 48, 49","tjanster":"TjänstA, TjänstB, TjänstD, TjänstC"},{"sida":"exempelmyndigheten.example (startsida eller bara domän loggad)","svar":85,"fragor":"1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 47, 48, 49, 50","tjanster":"TjänstA, TjänstB, TjänstD, TjänstC"},{"sida":"termbank.exempelmyndigheten.example (startsida eller bara domän loggad)","svar":81,"fragor":"1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 19, 20, 21, 22, 25, 26, 28, 29, 30, 32, 33, 34, 35, 37, 38, 39, 40, 41, 44, 45, 46, 47, 48, 49, 50","tjanster":"TjänstA, TjänstB, TjänstD, TjänstC"}],"andraDomaner":[{"doman":"kalla-f.example","svar":186,"andel":0.31}],"placeringar":{"1":159,"2":124,"3":49,"4":12,"5+":5}};
+const NS = "http://www.w3.org/2000/svg";
+const COLORS = {Alla:"var(--ink)", TjänstA:"var(--s1)", TjänstB:"var(--s2)", TjänstC:"var(--s3)", TjänstD:"var(--s4)"};
+const DOMS = ["exempelmyndigheten.example","kalla-b.example","kalla-c.example","kalla-d.example","kalla-e.example"];
+const arr = x => x == null ? [] : (Array.isArray(x) ? x : [x]);
+const nf = (v, d=1) => v == null ? "–" : v.toLocaleString("sv-SE", {minimumFractionDigits:d, maximumFractionDigits:d});
+const pct = v => v == null ? "–" : nf(v*100) + " %";
+const tal = v => nf(v);
+
+function el(tag, attrs={}, ...kids){
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) k === "class" ? e.className = v : e.setAttribute(k, v);
+  for (const k of kids) if (k != null) e.append(k);
+  return e;
+}
+function s(tag, attrs={}, text){
+  const e = document.createElementNS(NS, tag);
+  for (const [k,v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text != null) e.textContent = text;
+  return e;
+}
+const tip = document.getElementById("tip");
+function showTip(x, y, title, rows){
+  tip.replaceChildren(el("b", {}, title));
+  for (const r of rows){
+    const line = el("div");
+    if (r.color){ const i = el("i"); i.style.background = r.color; line.append(i); }
+    line.append(r.text);
+    tip.append(line);
+  }
+  tip.style.display = "block";
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.max(4, Math.min(x + 14, innerWidth - w - 4)) + "px";
+  tip.style.top = Math.max(4, Math.min(y + 14, innerHeight - h - 4)) + "px";
+}
+const hideTip = () => tip.style.display = "none";
+function hover(node, title, rows){
+  node.setAttribute("tabindex", "0");
+  node.addEventListener("mousemove", e => showTip(e.clientX, e.clientY, title, rows));
+  node.addEventListener("mouseleave", hideTip);
+  node.addEventListener("focus", () => { const b = node.getBoundingClientRect(); showTip(b.right, b.top, title, rows); });
+  node.addEventListener("blur", hideTip);
+}
+function table(head, rows, numFrom=1){
+  const t = el("table"), hr = el("tr");
+  head.forEach((h,i) => hr.append(el("th", i >= numFrom ? {class:"num"} : {}, h)));
+  t.append(el("thead", {}, hr));
+  const body = el("tbody");
+  for (const r of rows){
+    const tr = el("tr");
+    r.forEach((c,i) => tr.append(el("td", i >= numFrom ? {class:"num"} : {}, c == null ? "–" : String(c))));
+    body.append(tr);
+  }
+  t.append(body);
+  return el("div", {class:"scroll"}, t);
+}
+
+const app = document.getElementById("app");
+const M = D.meta, T = D.idag;
+if (M.testdata) app.append(el("div", {class:"banner"}, "⚠ TESTDATA. Alla värden är påhittade och visar bara hur rapporten fungerar. De säger ingenting om exempelmyndigheten.example."));
+app.append(el("h1", {}, "GEO-rapport för exempelmyndigheten.example"));
+app.append(el("p", {class:"sub"}, `Mätdag ${M.datum} · ${M.svar} av ${M.forvantat} möjliga svar · ${M.antalFragor} av 50 frågor · skapad ${M.skapad}`));
+app.append(el("p", {class:"sub"}, M.bedomning));
+const warn = arr(D.varningar);
+if (warn.length){
+  const ul = el("ul"); warn.forEach(w => ul.append(el("li", {}, w)));
+  const det = el("details", {class:"warnings"}, el("summary", {}, `⚠ ${warn.length} anmärkning(ar) om datakvaliteten`), ul);
+  det.open = true; app.append(det);
+}
+
+/* Nyckeltal */
+const kpis = el("div", {class:"grid kpis"});
+function kpi(label, key, fmt, factor, unit, lowerBetter, extra){
+  const c = el("div", {class:"card kpi"}, el("div", {class:"label"}, label), el("div", {class:"value"}, fmt(T[key])));
+  const d = el("div", {class:"delta"});
+  if (D.igar && T[key] != null && D.igar[key] != null){
+    const diff = (T[key] - D.igar[key]) * factor;
+    if (Math.abs(diff) < 0.05) d.textContent = "● oförändrat mot " + M.foregaende;
+    else {
+      const good = lowerBetter ? diff < 0 : diff > 0;
+      d.append(el("span", {class: good ? "up" : "down"}, `${diff > 0 ? "▲ +" : "▼ "}${nf(diff)}${unit} ${good ? "(bättre)" : "(sämre)"}`), ` mot ${M.foregaende}`);
+    }
+  } else d.textContent = "Ingen jämförelse ännu";
+  c.append(d);
+  if (extra) c.append(el("div", {class:"delta"}, extra));
+  kpis.append(c);
+}
+kpi("Citeringsgrad", "citeringsgrad", pct, 100, " p.e.", false, `95 % intervall ${pct(T.ciLag)} – ${pct(T.ciHog)}`);
+kpi("Share of Voice (SOV)", "sov", pct, 100, " p.e.", false, `Av alla källor: ${pct(T.sovAlla)}`);
+kpi("GEO-poäng (0–100)", "geo", tal, 1, "", false, T.geoUtanAnvandning ? "Utan innehållsanvändning" : "Eget sammanvägt index");
+kpi("Placering, snitt", "placering", tal, 1, "", true, `Först i listan: ${pct(T.andelForst)}`);
+kpi("Innehållsanvändning", "anvandning", pct, 100, " p.e.", false, `Utan länk: ${T.utanLank} svar`);
+app.append(kpis);
+
+/* Trender */
+app.append(el("h2", {}, "Utveckling över tid"));
+const trend = arr(D.trend).slice(-30);
+if (trend.length < 2) app.append(el("p", {class:"note"}, "Trendlinjer visas när det finns minst två mätdagar. Punkterna visar dagens värden."));
+const trendGrid = el("div", {class:"grid two"}); app.append(trendGrid);
+const charts = [];
+function lineChart(title, sub, key, fmt, opt={}){
+  const card = el("div", {class:"card"}, el("h3", {}, title), el("div", {class:"note"}, sub));
+  const names = ["Alla","TjänstA","TjänstB","TjänstC","TjänstD"].filter(n => n === "Alla" || trend.some(t => t.tjanster[n]));
+  const series = names.map(n => ({name:n, values:trend.map(t => { const m = n === "Alla" ? t.alla : t.tjanster[n]; return m ? m[key] : null; })}));
+  const legend = el("div", {class:"legend"});
+  series.forEach(se => { const i = el("i"); i.style.background = COLORS[se.name]; legend.append(el("span", {}, i, se.name)); });
+  const host = el("div");
+  const det = el("details", {}, el("summary", {}, "Visa som tabell"),
+    table(["Datum", ...names], trend.map((t,i) => [t.datum, ...series.map(se => fmt(se.values[i]))])));
+  card.append(legend, host, det); trendGrid.append(card);
+  charts.push(() => drawLines(host, title, series, fmt, opt));
+}
+function niceMax(v, cap){
+  if (v <= 0) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  const m = [1,2,2.5,4,5,8,10].find(m => m*p >= v) * p;
+  return cap ? Math.min(cap, m) : m;
+}
+function drawLines(host, title, series, fmt, opt){
+  const W = Math.max(280, host.clientWidth), H = 220, L = 52, R = 12, Tp = 10, B = 26;
+  const all = series.flatMap(se => se.values).filter(v => v != null);
+  const svg = s("svg", {viewBox:`0 0 ${W} ${H}`, height:H, role:"img", "aria-label":title + ". Använd piltangenterna för att läsa av värden.", tabindex:"0"});
+  host.replaceChildren(svg);
+  if (!all.length){ svg.append(s("text", {x:W/2, y:H/2, "text-anchor":"middle"}, "Ingen data loggad")); return; }
+  const lo = opt.invert ? 1 : 0;
+  const hi = opt.invert ? Math.max(3, Math.ceil(Math.max(...all))) : (Math.max(...all) > 0 ? niceMax(Math.max(...all) * 1.05, opt.cap) : (opt.cap || 1));
+  const n = trend.length;
+  const x = i => n === 1 ? L + (W-L-R)/2 : L + i * (W-L-R) / (n-1);
+  const y = v => { const f = (v-lo)/(hi-lo); return opt.invert ? Tp + f*(H-Tp-B) : H-B - f*(H-Tp-B); };
+  for (let k=0; k<=4; k++){
+    const v = lo + (hi-lo)*k/4;
+    svg.append(s("line", {x1:L, x2:W-R, y1:y(v), y2:y(v), stroke:"var(--grid)", "stroke-width":1}));
+    svg.append(s("text", {x:L-7, y:y(v)+4, "text-anchor":"end"}, opt.pct ? nf(v*100, Math.abs(v*100 - Math.round(v*100)) < 1e-6 ? 0 : 1)+" %" : nf(v, Number.isInteger(v) ? 0 : 1)));
+  }
+  const step = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W-L-R)/80))));
+  for (let i=n-1; i>=0; i-=step) svg.append(s("text", {x:x(i), y:H-6, "text-anchor": n > 1 && i === n-1 ? "end" : "middle"}, trend[i].datum.slice(5)));
+  const cross = s("line", {y1:Tp, y2:H-B, stroke:"var(--axis)", "stroke-width":1, visibility:"hidden"});
+  svg.append(cross);
+  for (const se of [...series].reverse()){
+    let d = "", pen = false;
+    se.values.forEach((v,i) => { if (v == null){ pen = false; return; } d += `${pen ? "L" : "M"}${x(i)},${y(v)}`; pen = true; });
+    svg.append(s("path", {d, fill:"none", stroke:COLORS[se.name], "stroke-width": se.name === "Alla" ? 3 : 2, "stroke-linejoin":"round", "stroke-linecap":"round"}));
+    se.values.forEach((v,i) => {
+      if (v == null) return;
+      const lone = se.values[i-1] == null && se.values[i+1] == null;
+      if (i === n-1 || lone || n <= 10) svg.append(s("circle", {cx:x(i), cy:y(v), r:4, fill:COLORS[se.name], stroke:"var(--surface)", "stroke-width":2}));
+    });
+  }
+  let cur = n-1;
+  function show(i, cx, cy){
+    cur = i; cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("visibility", "visible");
+    showTip(cx, cy, trend[i].datum, series.map(se => ({color:COLORS[se.name], text:`${se.name}: ${fmt(se.values[i])}`})));
+  }
+  const hide = () => { cross.setAttribute("visibility","hidden"); hideTip(); };
+  const hit = s("rect", {x:L-8, y:0, width:W-L-R+16, height:H, fill:"transparent"});
+  hit.addEventListener("mousemove", e => {
+    const b = svg.getBoundingClientRect(), px = (e.clientX - b.left) * W / b.width;
+    const i = n === 1 ? 0 : Math.max(0, Math.min(n-1, Math.round((px-L) / ((W-L-R)/(n-1)))));
+    show(i, e.clientX, e.clientY);
+  });
+  hit.addEventListener("mouseleave", hide);
+  svg.append(hit);
+  const key = i => { const b = svg.getBoundingClientRect(); show(i, b.left + x(i)*b.width/W, b.top + 20); };
+  svg.addEventListener("focus", () => key(cur));
+  svg.addEventListener("blur", hide);
+  svg.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight"){ e.preventDefault(); key(Math.max(0, Math.min(n-1, cur + (e.key === "ArrowLeft" ? -1 : 1)))); }
+  });
+}
+lineChart("Citeringsgrad", "Andel svar som citerar exempelmyndigheten.example", "citeringsgrad", pct, {pct:true, cap:1});
+lineChart("Share of Voice", "Andel av citeringarna inom jämförelsegruppen", "sov", pct, {pct:true, cap:1});
+lineChart("GEO-poäng", "Sammanvägt index, 0–100", "geo", tal, {cap:100});
+lineChart("Placering", "Snittplats i källistan, högre upp i diagrammet är bättre", "placering", tal, {invert:true});
+lineChart("Innehållsanvändning", "Andel svar med citat eller parafras", "anvandning", pct, {pct:true, cap:1});
+
+/* Liggande staplar */
+function bars(title, sub, items, fmt, max){
+  const card = el("div", {class:"card"}, el("h3", {}, title), el("div", {class:"note"}, sub));
+  const host = el("div"); card.append(host,
+    el("details", {}, el("summary", {}, "Visa som tabell"), table(["Kategori","Värde"], items.map(i => [i.label, fmt(i.value)]))));
+  charts.push(() => {
+    const W = Math.max(280, host.clientWidth), row = 32, L = Math.min(170, W*0.42), R = 62, H = items.length*row + 4;
+    const svg = s("svg", {viewBox:`0 0 ${W} ${H}`, height:H, role:"img", "aria-label":title});
+    const top = max || Math.max(...items.map(i => i.value || 0), 0.000001);
+    items.forEach((it,i) => {
+      const w = (it.value || 0) / top * (W-L-R), y = i*row + 8, h = 18, r = Math.min(4, w/2);
+      const g = s("g");
+      g.append(s("rect", {x:0, y:i*row, width:W, height:row, fill:"transparent"}));
+      g.append(s("text", {x:L-8, y:y+13, "text-anchor":"end", class:"cat"}, it.label));
+      if (w > 0) g.append(s("path", {d:`M${L},${y}H${L+w-r}Q${L+w},${y} ${L+w},${y+r}V${y+h-r}Q${L+w},${y+h} ${L+w-r},${y+h}H${L}Z`, fill:it.color || "var(--s1)"}));
+      g.append(s("text", {x:L+w+7, y:y+13, class:"val"}, fmt(it.value)));
+      hover(g, it.label, [{text: it.tip || fmt(it.value)}]);
+      svg.append(g);
+    });
+    svg.append(s("line", {x1:L, x2:L, y1:2, y2:H-2, stroke:"var(--axis)"}));
+    host.replaceChildren(svg);
+  });
+  return card;
+}
+
+app.append(el("h2", {}, "Jämförelse och placering"));
+const g1 = el("div", {class:"grid two"}); app.append(g1);
+g1.append(bars("Citeringsgrad per domän", "Samma frågor, dagens mätning", DOMS.map(d => ({label:d, value:T.domaner[d], color: d === DOMS[0] ? "var(--s1)" : "var(--deemph)"})).sort((a,b) => b.value-a.value), pct, 1));
+const P = D.placeringar;
+g1.append(bars("Placering i källistan", "Antal svar per plats för exempelmyndigheten.example", Object.keys(P).sort().map(k => ({label:"Plats " + k, value:P[k]})), v => nf(v,0)));
+
+app.append(el("h2", {}, "Per tjänst"));
+app.append(el("div", {class:"card"}, table(["Tjänst","Svar","Citeringsgrad","Med webbsökning","SOV","GEO","Placering","Användning"],
+  arr(D.tjanster).map(t => { const m = t.matt; return [t.namn, m.n, pct(m.citeringsgrad), pct(m.citeringsgradWebb), pct(m.sov), tal(m.geo), tal(m.placering), pct(m.anvandning)]; }))));
+
+/* Värmekartor */
+function heat(title, sub, cols, rows){
+  const t = el("table"), hr = el("tr", {}, el("th", {}, "Ämnesområde"));
+  cols.forEach(c => hr.append(el("th", {class:"num"}, c)));
+  t.append(el("thead", {}, hr));
+  const body = el("tbody");
+  rows.forEach(r => {
+    const tr = el("tr", {}, el("td", {}, r.label));
+    r.values.forEach((v,i) => {
+      const td = el("td", {class:"heat"}, pct(v));
+      if (v != null){ const a = 0.06 + 0.82*v; td.style.background = `rgba(var(--heat),${a})`; if (a > 0.72) td.style.color = "#fff"; }
+      hover(td, r.label, [{text:`${cols[i]}: ${pct(v)}`}]);
+      tr.append(td);
+    });
+    body.append(tr);
+  });
+  t.append(body);
+  return el("div", {class:"card"}, el("h3", {}, title), el("div", {class:"note"}, sub), el("div", {class:"scroll"}, t));
+}
+app.append(el("h2", {}, "Ämnesområden"));
+const areas = arr(D.omraden);
+app.append(heat("Citeringsgrad per område och domän", "Mörkare färg betyder högre andel", DOMS, areas.map(a => ({label:a.namn, values:DOMS.map(d => a.matt.domaner[d])}))));
+const services = arr(D.tjanster).map(t => t.namn);
+const h2 = heat("exempelmyndigheten.example per område och tjänst", "Citeringsgrad i dagens mätning", services, areas.map(a => ({label:a.namn, values:services.map(t => a.tjanster[t])})));
+h2.style.marginTop = "12px"; app.append(h2);
+
+/* Innehållsanvändning */
+app.append(el("h2", {}, "Innehållsanvändning"));
+const g2 = el("div", {class:"grid two"}); app.append(g2);
+const labels = {citat:"Citat", parafras:"Parafras", omnamnande:"Omnämnande", ingen:"Ingen"};
+g2.append(bars("Hur innehållet används", `Antal svar, loggat för ${T.anvandningN} av ${T.n}`, Object.keys(labels).map(k => ({label:labels[k], value:T.typer[k]})), v => nf(v,0)));
+const other = arr(D.andraDomaner);
+g2.append(el("div", {class:"card"}, el("h3", {}, "Andra källor som citeras mest"), el("div", {class:"note"}, "Domäner utanför jämförelsegruppen"),
+  other.length ? table(["Domän","Svar","Andel"], other.map(o => [o.doman, o.svar, pct(o.andel)])) : el("p", {class:"note"}, "Inga loggade.")));
+const pages = arr(D.sidor);
+const pageCard = el("div", {class:"card"}, el("h3", {}, "Mest citerade sidor på exempelmyndigheten.example"), el("div", {class:"note"}, "Högst 25 sidor, dagens mätning"));
+if (pages.length){
+  const tb = table(["Sida","Tjänster","Frågor","Svar"], pages.map(p => [p.sida, p.tjanster, p.fragor, p.svar]), 3);
+  tb.querySelectorAll("tbody td:first-child").forEach(td => td.className = "url");
+  pageCard.append(tb);
+} else pageCard.append(el("p", {class:"note"}, "Inga citeringar av exempelmyndigheten.example loggade."));
+pageCard.style.marginTop = "12px"; app.append(pageCard);
+
+/* Frågor */
+app.append(el("h2", {}, "Fråga för fråga"));
+const qCard = el("div", {class:"card"}, el("div", {class:"note"}, "Klicka på en rubrik för att sortera. Svagast citeringsgrad visas först. M = medborgare, Y = yrkesverksam, ★ = bred grundfråga."));
+const qCols = [
+  ["Nr", q => q.nr, q => q.nr + (q.bred ? " ★" : ""), true],
+  ["Fråga", q => q.fraga, q => q.fraga, false],
+  ["Målgrupp", q => q.malgrupp, q => q.malgrupp, false],
+  ["Svar", q => q.n, q => q.n, true],
+  ["Citeringsgrad", q => q.citeringsgrad, q => pct(q.citeringsgrad), true],
+  ["Förändring", q => q.fore == null ? null : q.citeringsgrad - q.fore, q => { if (q.fore == null) return "–"; const d = (q.citeringsgrad - q.fore)*100; return Math.abs(d) < 0.05 ? "● 0" : (d > 0 ? "▲ +" : "▼ ") + nf(d,0) + " p.e."; }, true],
+  ["SOV", q => q.sov, q => pct(q.sov), true],
+  ["Placering", q => q.placering, q => tal(q.placering), true],
+  ["Användning", q => q.anvandning, q => pct(q.anvandning), true]
+];
+let sortCol = 4, asc = true;
+const qWrap = el("div", {class:"scroll"}); qCard.append(qWrap); app.append(qCard);
+function drawQ(){
+  const t = el("table"), hr = el("tr");
+  qCols.forEach((c,i) => {
+    const th = el("th", {class:"sort" + (c[3] ? " num" : ""), tabindex:"0", "aria-sort": i === sortCol ? (asc ? "ascending" : "descending") : "none"}, c[0] + (i === sortCol ? (asc ? " ↑" : " ↓") : ""));
+    const go = () => { asc = sortCol === i ? !asc : true; sortCol = i; drawQ(); };
+    th.addEventListener("click", go); th.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+    hr.append(th);
+  });
+  t.append(el("thead", {}, hr));
+  const rows = [...arr(D.fragor)].sort((a,b) => {
+    const x = qCols[sortCol][1](a), y = qCols[sortCol][1](b);
+    if (x == null || y == null) return x == null ? (y == null ? 0 : 1) : -1;
+    const r = typeof x === "string" ? x.localeCompare(y, "sv") : x - y;
+    return r === 0 ? a.nr - b.nr : (asc ? r : -r);
+  });
+  const body = el("tbody");
+  rows.forEach(q => { const tr = el("tr"); qCols.forEach(c => tr.append(el("td", c[3] ? {class:"num"} : {}, String(c[2](q))))); body.append(tr); });
+  t.append(body); qWrap.replaceChildren(t);
+}
+drawQ();
+
+/* Definitioner */
+app.append(el("h2", {}, "Så räknas måtten"));
+const dl = el("dl");
+[
+  ["Citeringsgrad","Svar där exempelmyndigheten.example finns bland källorna, delat med alla loggade svar."],
+  ["Share of Voice (SOV)","Svar som citerar exempelmyndigheten.example, delat med summan av citeringar för de fem domänerna i jämförelsegruppen. Varje domän räknas högst en gång per svar. ”Av alla källor” delar i stället med samtliga unika domäner."],
+  ["Placering","Exempelmyndighetens första plats i källistan, räknad från 1. Snittet gäller bara svar där domänen citeras."],
+  ["Innehållsanvändning","Svar märkta citat eller parafras, delat med svar där användningen är loggad."],
+  ["GEO-poäng","Eget index för Generative Engine Optimization: citeringsgrad 40 %, SOV 20 %, placering (snitt av 1 delat med platsen) 20 % och innehållsanvändning 20 %. Det är inte en branschstandard."],
+  ["Osäkerhet","Källorna varierar mellan körningar. Intervallet och bedömningen av förändringar är ungefärliga eftersom upprepade körningar inte är helt oberoende."]
+].forEach(([a,b]) => dl.append(el("dt", {}, a), el("dd", {}, b)));
+app.append(el("div", {class:"card"}, dl));
+app.append(el("p", {class:"note"}, "Källfiler: " + arr(M.filer).join(", ")));
+
+const draw = () => charts.forEach(f => f());
+draw();
+let timer; addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(draw, 150); });
+</script>
+<script>
+(() => {
+  const rubriker = [...document.querySelectorAll("#app h2")];
+  if (!rubriker.length) return;
+  const meny = document.createElement("nav");
+  meny.id = "sektioner"; meny.setAttribute("aria-label", "Avsnitt i rapporten");
+  rubriker.forEach((h, i) => {
+    h.id = "avsnitt-" + (i + 1);
+    const a = document.createElement("a");
+    a.href = "#" + h.id; a.textContent = h.textContent; meny.append(a);
+  });
+  document.querySelector("#app .kpis").before(meny);
+})();
+</script>
+</body>
+</html>

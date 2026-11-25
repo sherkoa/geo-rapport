@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frågor och metod</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10); --good:#006300; --bad:#d03b3b; --warn:#fab219;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --deemph:#a9a79f; --heat:42,120,214;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10); --good:#0ca30c; --bad:#e66767;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --deemph:#5f5e58; --heat:57,135,229;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 64px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:19px;margin:36px 0 12px}
+h3{font-size:15px;margin:0 0 2px}
+.sub{color:var(--ink2);margin:0 0 6px}
+.note{color:var(--ink2);font-size:13px;margin:6px 0 0}
+.banner{border:2px solid var(--warn);border-radius:8px;padding:12px 16px;margin:0 0 20px;font-weight:600}
+.warnings{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:14px}
+.warnings ul{margin:6px 0;padding-left:20px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:18px}
+.two{grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-width:0}
+.kpi .label{color:var(--ink2);font-size:13px}
+.kpi .value{font-size:32px;font-weight:600;line-height:1.2;margin:2px 0}
+.kpi .delta{font-size:13px;color:var(--ink2)}
+.up{color:var(--good);font-weight:600}.down{color:var(--bad);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--ink2);margin:6px 0}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+svg{display:block;width:100%;overflow:visible}
+svg text{fill:var(--muted);font-size:11px}
+svg text.val{fill:var(--ink)}
+svg text.cat{fill:var(--ink2);font-size:12px}
+svg:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+th{color:var(--ink2);font-weight:600}
+th.sort{cursor:pointer;user-select:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.heat{text-align:center;font-variant-numeric:tabular-nums;border:2px solid var(--surface)}
+td.url{overflow-wrap:anywhere}
+details{margin-top:8px;font-size:13px}
+summary{cursor:pointer;color:var(--ink2)}
+#tip{position:fixed;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--axis);border-radius:8px;padding:8px 10px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.18);display:none;z-index:9;max-width:320px}
+#tip b{display:block;margin-bottom:2px}
+#tip i{display:inline-block;width:10px;height:3px;margin-right:6px;vertical-align:middle}
+dl{font-size:14px}dt{font-weight:600;margin-top:8px}dd{margin:0;color:var(--ink2)}
+@media print{#tip{display:none!important}.card{break-inside:avoid}}
+</style>
+<style>
+.site{background:var(--surface);border-bottom:1px solid var(--border)}
+.site div{max-width:1120px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline}
+.site strong{font-size:16px}
+.site span{color:var(--ink2);font-size:13px}
+.site nav{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto}
+a{color:var(--s1)}
+.site nav a,#sektioner a{color:var(--ink);text-decoration:none;padding:5px 10px;border-radius:6px;font-size:14px}
+.site nav a:hover,#sektioner a:hover{background:var(--grid)}
+.site nav a[aria-current=page]{background:var(--ink);color:var(--surface)}
+#sektioner{display:flex;flex-wrap:wrap;gap:4px;margin:14px 0 0}
+#sektioner a{border:1px solid var(--border);background:var(--surface);font-size:13px}
+h2{scroll-margin-top:12px}
+</style>
+<meta name="robots" content="noindex">
+<style>.card::before{content:"DEMO \2013  p\00E5hittade siffror och namn";display:block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink2);border-bottom:2px solid var(--warn);margin-bottom:8px;padding-bottom:3px}</style>
+</head>
+<body>
+<header class="site"><div><strong>Synlighet i AI-svar: exempelmyndigheten.example</strong><span>DEMO: påhittade siffror och namn</span><nav aria-label="Huvudmeny"><a href="index.html">Senaste rapporten</a><a href="matdagar.html">Alla mätdagar</a><a href="fragor.html" aria-current="page">Frågor och metod</a><a href="../index.html">Till riktiga sidan</a></nav></div></header>
+<main class="wrap"><div class="banner">&#9888; DEMO. Namnen är utbytta mot påhittade exempelnamn.</div>
+
+<h1>Frågor och metod</h1><h2>Så mäter vi</h2><div class="card"><ul><li>Varje fråga körs i ny session, utloggad eller i privat läge, på svenska och med samma datum.</li><li>Tre körningar per fråga och tjänst: TjänstA, TjänstB, TjänstC och TjänstD.</li><li>Källorna loggas i den ordning tjänsten visar dem.</li><li>Jämförelsegrupp: exempelmyndigheten.example, kalla-b.example, kalla-c.example, kalla-d.example och kalla-e.example.</li></ul></div><h2>Måtten</h2><div class="card"><dl><dt>Citeringsgrad</dt><dd>Andel svar med exempelmyndigheten.example bland källorna.</dd><dt>Share of Voice (SOV)</dt><dd>Exempelmyndighetens andel av citeringarna inom jämförelsegruppen.</dd><dt>Placering</dt><dd>Första platsen i källistan, där 1 är bäst. Snittet gäller svar med citering.</dd><dt>Innehållsanvändning</dt><dd>Andel bedömda svar med citat eller parafras.</dd><dt>GEO-poäng</dt><dd>Eget index (Generative Engine Optimization), 0&ndash;100: citeringsgrad 40 %, SOV, placering och innehållsanvändning 20 % var. Ingen branschstandard.</dd></dl></div><h2>Statistik och register</h2><div class="card scroll"><table><thead><tr><th class="num">Nr</th><th>Fråga</th><th>Målgrupp</th></tr></thead><tbody><tr><td class="num">1</td><td>Hur m&#229;nga dog i Sverige av cancer f&#246;rra &#229;ret?</td><td>Medborgare</td></tr><tr><td class="num">2</td><td>Vilka &#228;r de vanligaste d&#246;dsorsakerna i Sverige?</td><td>Medborgare</td></tr><tr><td class="num">3</td><td>Hur har antalet cancerfall i Sverige utvecklats de senaste 20 &#229;ren?</td><td>Medborgare</td></tr><tr><td class="num">4</td><td>Hur m&#229;nga personer med demens finns det i Sverige?</td><td>Medborgare</td></tr><tr><td class="num">5</td><td>Hur m&#229;nga aborter g&#246;rs i Sverige per &#229;r?</td><td>Medborgare</td></tr><tr><td class="num">6</td><td>Hur m&#229;nga barn f&#246;ds med kejsarsnitt i Sverige?</td><td>Medborgare</td></tr><tr><td class="num">7</td><td>Hur ofta f&#246;rskrivs antidepressiva l&#228;kemedel till unga i Sverige?</td><td>Yrkesverksam</td></tr><tr><td class="num">8</td><td>Var hittar jag statistik fr&#229;n patientregistret och l&#228;kemedelsregistret?</td><td>Yrkesverksam</td></tr><tr><td class="num">9</td><td>Hur m&#229;nga personer f&#229;r insatser enligt LSS i Sverige?</td><td>Yrkesverksam</td></tr><tr><td class="num">10</td><td>Hur m&#229;nga &#228;ldre har hemtj&#228;nst eller bor p&#229; s&#228;rskilt boende?</td><td>Medborgare</td></tr></tbody></table></div><h2>F&#246;reskrifter och regler</h2><div class="card scroll"><table><thead><tr><th class="num">Nr</th><th>Fråga</th><th>Målgrupp</th></tr></thead><tbody><tr><td class="num">11</td><td>Vad s&#228;ger Exempelmyndighetens f&#246;reskrifter om ledningssystem f&#246;r systematiskt kvalitetsarbete?</td><td>Yrkesverksam</td></tr><tr><td class="num">12</td><td>Vilka f&#246;reskrifter g&#228;ller f&#246;r journalf&#246;ring i h&#228;lso- och sjukv&#229;rden?</td><td>Yrkesverksam</td></tr><tr><td class="num">13</td><td>Vad &#228;r skillnaden mellan f&#246;reskrifter och allm&#228;nna r&#229;d fr&#229;n Exempelmyndigheten?</td><td>Yrkesverksam</td></tr><tr><td class="num">14</td><td>Vilka krav g&#228;ller f&#246;r hantering av l&#228;kemedel i kommunal h&#228;lso- och sjukv&#229;rd?</td><td>Yrkesverksam</td></tr><tr><td class="num">15</td><td>Vad inneb&#228;r Exempelmyndighetens f&#246;reskrifter om v&#229;rd i livets slut?</td><td>Yrkesverksam</td></tr><tr><td class="num">16</td><td>Vilka regler g&#228;ller f&#246;r dokumentation inom socialtj&#228;nsten?</td><td>Yrkesverksam</td></tr><tr><td class="num">17</td><td>Vilka krav st&#228;lls p&#229; verksamheter som utf&#246;r delegerade h&#228;lso- och sjukv&#229;rdsuppgifter?</td><td>Yrkesverksam</td></tr></tbody></table></div><h2>Nationella riktlinjer och kunskapsst&#246;d</h2><div class="card scroll"><table><thead><tr><th class="num">Nr</th><th>Fråga</th><th>Målgrupp</th></tr></thead><tbody><tr><td class="num">18</td><td>Vad s&#228;ger nationella riktlinjerna om behandling av depression och &#229;ngest?</td><td>Yrkesverksam</td></tr><tr><td class="num">19</td><td>Vilka rekommendationer finns f&#246;r v&#229;rd vid diabetes?</td><td>Yrkesverksam</td></tr><tr><td class="num">20</td><td>Vad rekommenderar nationella riktlinjer vid KOL och astma?</td><td>Yrkesverksam</td></tr><tr><td class="num">21</td><td>Vilka rekommendationer finns f&#246;r v&#229;rd vid hj&#228;rtsjukdom och stroke?</td><td>Yrkesverksam</td></tr><tr><td class="num">22</td><td>Vad s&#228;ger riktlinjerna om screening f&#246;r br&#246;stcancer, livmoderhalscancer och tarmcancer?</td><td>Medborgare</td></tr><tr><td class="num">23</td><td>Vad &#228;r en nationell riktlinje och hur tas den fram? (bred grundfråga)</td><td>Medborgare</td></tr><tr><td class="num">24</td><td>Vilka rekommendationer finns f&#246;r tandv&#229;rd och f&#246;rebyggande tandv&#229;rd?</td><td>Yrkesverksam</td></tr><tr><td class="num">25</td><td>Vad rekommenderar Exempelmyndigheten vid behandling av missbruk och beroende?</td><td>Yrkesverksam</td></tr><tr><td class="num">26</td><td>Vilket kunskapsst&#246;d finns f&#246;r v&#229;rd och omsorg om personer med demenssjukdom?</td><td>Yrkesverksam</td></tr><tr><td class="num">27</td><td>Vad s&#228;ger Exempelmyndigheten om v&#229;rd och behandling vid k&#246;nsdysfori?</td><td>Medborgare</td></tr></tbody></table></div><h2>Legitimation och beh&#246;righet</h2><div class="card scroll"><table><thead><tr><th class="num">Nr</th><th>Fråga</th><th>Målgrupp</th></tr></thead><tbody><tr><td class="num">28</td><td>Hur ans&#246;ker jag om svensk legitimation som l&#228;kare med utbildning fr&#229;n utanf&#246;r EU?</td><td>Medborgare</td></tr><tr><td class="num">29</td><td>Hur l&#229;ng tid tar det att f&#229; legitimation som sjuksk&#246;terska i Sverige?</td><td>Medborgare</td></tr><tr><td class="num">30</td><td>Vilka yrken inom h&#228;lso- och sjukv&#229;rden &#228;r legitimationsyrken? (bred grundfråga)</td><td>Medborgare</td></tr><tr><td class="num">31</td><td>Vad kr&#228;vs f&#246;r att f&#229; specialistbevis som l&#228;kare?</td><td>Yrkesverksam</td></tr><tr><td class="num">32</td><td>Hur fungerar kunskapsprov och praktisk tj&#228;nstg&#246;ring f&#246;r utl&#228;ndska l&#228;kare?</td><td>Medborgare</td></tr><tr><td class="num">33</td><td>Kan jag f&#229; min legitimation &#229;terkallad och vad h&#228;nder d&#229;?</td><td>Yrkesverksam</td></tr></tbody></table></div><h2>Socialtj&#228;nst, barn och unga, &#228;ldre</h2><div class="card scroll"><table><thead><tr><th class="num">Nr</th><th>Fråga</th><th>Målgrupp</th></tr></thead><tbody><tr><td class="num">34</td><td>Vad &#228;r skillnaden mellan LVU, LVM och LSS?</td><td>Medborgare</td></tr><tr><td class="num">35</td><td>Hur ska socialtj&#228;nsten utreda barn som far illa?</td><td>Yrkesverksam</td></tr><tr><td class="num">36</td><td>Vad s&#228;ger Exempelmyndigheten om v&#229;ld i n&#228;ra relationer och socialtj&#228;nstens ansvar?</td><td>Yrkesverksam</td></tr><tr><td class="num">37</td><td>Vilket st&#246;d finns f&#246;r personer som uts&#228;tts f&#246;r v&#229;ld i n&#228;ra relationer?</td><td>Medborgare</td></tr><tr><td class="num">38</td><td>Vad g&#228;ller f&#246;r ekonomiskt bist&#229;nd och f&#246;rs&#246;rjningsst&#246;d?</td><td>Medborgare</td></tr><tr><td class="num">39</td><td>Vad menas med god kvalitet i &#228;ldreomsorgen?</td><td>Medborgare</td></tr><tr><td class="num">40</td><td>Vad &#228;r en genomf&#246;randeplan och vem ska g&#246;ra den?</td><td>Yrkesverksam</td></tr><tr><td class="num">41</td><td>Vilka r&#228;ttigheter har en person som f&#229;r insatser enligt LSS?</td><td>Medborgare</td></tr></tbody></table></div><h2>L&#228;kemedel, smittskydd och patients&#228;kerhet</h2><div class="card scroll"><table><thead><tr><th class="num">Nr</th><th>Fråga</th><th>Målgrupp</th></tr></thead><tbody><tr><td class="num">42</td><td>Vilka l&#228;kemedel f&#229;r sjuksk&#246;terskor f&#246;rskriva?</td><td>Yrkesverksam</td></tr><tr><td class="num">43</td><td>Vad &#228;r l&#228;kemedelsgenomg&#229;ng och vem ska f&#229; det?</td><td>Yrkesverksam</td></tr><tr><td class="num">44</td><td>Vad inneb&#228;r det att anm&#228;la en avvikelse eller risk f&#246;r v&#229;rdskada?</td><td>Yrkesverksam</td></tr><tr><td class="num">45</td><td>Vilka regler g&#228;ller f&#246;r anv&#228;ndning av tv&#229;ngs&#229;tg&#228;rder i psykiatrin?</td><td>Yrkesverksam</td></tr><tr><td class="num">46</td><td>Hur fungerar organdonation i Sverige och hur registrerar jag mitt val?</td><td>Medborgare</td></tr></tbody></table></div><h2>Krisberedskap, begrepp och data</h2><div class="card scroll"><table><thead><tr><th class="num">Nr</th><th>Fråga</th><th>Målgrupp</th></tr></thead><tbody><tr><td class="num">47</td><td>Vilka krav st&#228;lls p&#229; h&#228;lso- och sjukv&#229;rdens krisberedskap och civila f&#246;rsvar?</td><td>Yrkesverksam</td></tr><tr><td class="num">48</td><td>Vad &#228;r ICD-10-SE och hur anv&#228;nds diagnoskoder i Sverige?</td><td>Yrkesverksam</td></tr><tr><td class="num">49</td><td>Vad &#228;r SNOMED CT och hur anv&#228;nds det i svensk v&#229;rd?</td><td>Yrkesverksam</td></tr><tr><td class="num">50</td><td>Var hittar jag Exempelmyndighetens termbank och definitioner av v&#229;rdbegrepp? (bred grundfråga)</td><td>Yrkesverksam</td></tr></tbody></table></div>
+</main>
+</body>
+</html>
