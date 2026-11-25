@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inga mätningar ännu</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10); --good:#006300; --bad:#d03b3b; --warn:#fab219;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --deemph:#a9a79f; --heat:42,120,214;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10); --good:#0ca30c; --bad:#e66767;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --deemph:#5f5e58; --heat:57,135,229;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 64px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:19px;margin:36px 0 12px}
+h3{font-size:15px;margin:0 0 2px}
+.sub{color:var(--ink2);margin:0 0 6px}
+.note{color:var(--ink2);font-size:13px;margin:6px 0 0}
+.banner{border:2px solid var(--warn);border-radius:8px;padding:12px 16px;margin:0 0 20px;font-weight:600}
+.warnings{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:10px 16px;margin-top:14px;font-size:14px}
+.warnings ul{margin:6px 0;padding-left:20px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:18px}
+.two{grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-width:0}
+.kpi .label{color:var(--ink2);font-size:13px}
+.kpi .value{font-size:32px;font-weight:600;line-height:1.2;margin:2px 0}
+.kpi .delta{font-size:13px;color:var(--ink2)}
+.up{color:var(--good);font-weight:600}.down{color:var(--bad);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--ink2);margin:6px 0}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+svg{display:block;width:100%;overflow:visible}
+svg text{fill:var(--muted);font-size:11px}
+svg text.val{fill:var(--ink)}
+svg text.cat{fill:var(--ink2);font-size:12px}
+svg:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+th{color:var(--ink2);font-weight:600}
+th.sort{cursor:pointer;user-select:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.heat{text-align:center;font-variant-numeric:tabular-nums;border:2px solid var(--surface)}
+td.url{overflow-wrap:anywhere}
+details{margin-top:8px;font-size:13px}
+summary{cursor:pointer;color:var(--ink2)}
+#tip{position:fixed;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--axis);border-radius:8px;padding:8px 10px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.18);display:none;z-index:9;max-width:320px}
+#tip b{display:block;margin-bottom:2px}
+#tip i{display:inline-block;width:10px;height:3px;margin-right:6px;vertical-align:middle}
+dl{font-size:14px}dt{font-weight:600;margin-top:8px}dd{margin:0;color:var(--ink2)}
+@media print{#tip{display:none!important}.card{break-inside:avoid}}
+</style>
+<style>
+.site{background:var(--surface);border-bottom:1px solid var(--border)}
+.site div{max-width:1120px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;gap:6px 20px;align-items:baseline}
+.site strong{font-size:16px}
+.site span{color:var(--ink2);font-size:13px}
+.site nav{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto}
+a{color:var(--s1)}
+.site nav a,#sektioner a{color:var(--ink);text-decoration:none;padding:5px 10px;border-radius:6px;font-size:14px}
+.site nav a:hover,#sektioner a:hover{background:var(--grid)}
+.site nav a[aria-current=page]{background:var(--ink);color:var(--surface)}
+#sektioner{display:flex;flex-wrap:wrap;gap:4px;margin:14px 0 0}
+#sektioner a{border:1px solid var(--border);background:var(--surface);font-size:13px}
+h2{scroll-margin-top:12px}
+</style>
+</head>
+<body>
+<header class="site"><div><strong>Synlighet i AI-svar: socialstyrelsen.se</strong><span>Fristående analys, inte Socialstyrelsens webbplats</span><nav aria-label="Huvudmeny"><a href="index.html" aria-current="page">Senaste rapporten</a><a href="matdagar.html">Alla mätdagar</a><a href="fragor.html">Frågor och metod</a></nav></div></header>
+<main class="wrap">
+
+<h1>Inga mätningar ännu</h1><p class="sub">Här visas diagram och tabeller över hur socialstyrelsen.se citeras i AI-svar när de första mätningarna är klara.</p><div class="card"><p>Frågorna ställs till ChatGPT, Claude, Gemini och Copilot. Läs mer under <a href="fragor.html">Frågor och metod</a>.</p></div>
+</main>
+</body>
+</html>
